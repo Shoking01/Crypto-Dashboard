@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- Theme Color para navegadores móviles -->
+    <meta name="theme-color" content="#0a0f1a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    
+    <!-- SEO Meta Tags -->
+    <title>CryptoDashboard | Precios de Criptomonedas en Tiempo Real</title>
+    <meta name="description" content="Dashboard profesional de criptomonedas con precios en tiempo real, gráficos interactivos y análisis de mercado. Sigue Bitcoin, Ethereum y más de 1000 criptos." />
+    <meta name="keywords" content="criptomonedas, bitcoin, ethereum, trading, precios crypto, análisis mercado, blockchain, altcoins, crypto dashboard" />
+    <meta name="author" content="CryptoDashboard" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cryptodashboard.app" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cryptodashboard.app" />
+    <meta property="og:title" content="CryptoDashboard | Precios de Criptomonedas en Tiempo Real" />
+    <meta property="og:description" content="Dashboard profesional de criptomonedas con precios en tiempo real, gráficos interactivos y análisis de mercado." />
+    <meta property="og:image" content="https://cryptodashboard.app/og-image.jpg" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="CryptoDashboard" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://cryptodashboard.app" />
+    <meta property="twitter:title" content="CryptoDashboard | Precios de Criptomonedas en Tiempo Real" />
+    <meta property="twitter:description" content="Dashboard profesional de criptomonedas con precios en tiempo real, gráficos interactivos y análisis de mercado." />
+    <meta property="twitter:image" content="https://cryptodashboard.app/og-image.jpg" />
+    
+    <!-- Preconnect a orígenes críticos - Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.coingecko.com" crossorigin />
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://api.coingecko.com" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- Preload de fuentes críticas - Performance: font-display: swap ya previene FOIT -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+    
+    <!-- Critical CSS inline para LCP -->
+    <style>
+      /* Critical: Theme setup before React hydration */
+      :root {
+        --bg-primary: #0a0f1a;
+        --text-primary: #f9fafb;
+      }
+      
+      [data-theme="light"] {
+        --bg-primary: #ffffff;
+        --text-primary: #111827;
+      }
+      
+      body {
+        margin: 0;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      
+      /* Prevent flash of unstyled content */
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading state */
+      .app-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: var(--bg-primary);
+      }
+      
+      .app-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--bg-primary);
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CryptoDashboard",
+      "description": "Dashboard profesional de criptomonedas con precios en tiempo real, gráficos interactivos y análisis de mercado.",
+      "url": "https://cryptodashboard.app",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
+    <!-- Prevent Flash of Wrong Theme - Critical -->
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('crypto-dashboard-theme');
+          if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main-content" style="position:absolute;top:-40px;left:0;background:#6366f1;color:white;padding:8px;text-decoration:none;z-index:9999;">Saltar al contenido principal</a>
+    
+    <!-- Loading fallback mientras carga React -->
+    <div id="root">
+      <div class="app-loading">
+        <div class="app-loading-spinner"></div>
+      </div>
+    </div>
+    
+    <!-- Module script - deferred by default -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
