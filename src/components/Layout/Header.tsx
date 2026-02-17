@@ -14,9 +14,10 @@
  */
 
 import { memo, useMemo } from 'react';
-import { RefreshCw, Clock, Zap } from 'lucide-react';
+import { RefreshCw, Clock } from 'lucide-react';
 import { ThemeToggle } from '../ThemeToggle';
 import { formatTime } from '../../utils/formatters';
+import logo from '../../assets/Logo.png';
 
 interface HeaderProps {
   lastUpdated: Date;
@@ -43,9 +44,11 @@ const HeaderComponent = memo(function Header({
       <div className="app-header-inner">
         {/* Logo */}
         <div className="app-header-logo">
-          <div className="app-header-icon">
-            <Zap size={24} style={{ color: 'white' }} />
-          </div>
+          <img 
+            src={logo} 
+            alt="Crypto Dashboard Logo" 
+            className="app-header-logo-image"
+          />
           <div className="app-header-title">
             <h1 className="app-header-title-text">
               Crypto<span style={{ color: 'var(--accent-primary)' }}>Dashboard</span>
