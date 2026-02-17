@@ -17,7 +17,7 @@ import { memo, useMemo } from 'react';
 import { RefreshCw, Clock } from 'lucide-react';
 import { ThemeToggle } from '../ThemeToggle';
 import { formatTime } from '../../utils/formatters';
-import logo from '../../assets/Logo.png';
+import logo from '../../assets/Logo2.png';
 
 interface HeaderProps {
   lastUpdated: Date;
