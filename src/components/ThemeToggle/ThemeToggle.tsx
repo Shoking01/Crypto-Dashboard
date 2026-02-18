@@ -21,32 +21,11 @@ const ThemeToggleComponent = memo(function ThemeToggle() {
       onClick={handleClick}
       aria-label={`Cambiar a modo ${isDark ? 'claro' : 'oscuro'}`}
       title={`Cambiar a modo ${isDark ? 'claro' : 'oscuro'}`}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '44px',
-        height: '44px',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-default)',
-        background: 'var(--bg-tertiary)',
-        cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all var(--transition-fast)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--accent-primary)';
-        e.currentTarget.style.transform = 'scale(1.05)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--border-default)';
-        e.currentTarget.style.transform = 'scale(1)';
-      }}
+      className="theme-toggle-btn"
     >
-      {/* Icono Sol */}
       <Sun
-        size={20}
+        size={16}
+        className="theme-toggle-sun"
         style={{
           position: 'absolute',
           color: 'var(--status-warning)',
@@ -56,9 +35,8 @@ const ThemeToggleComponent = memo(function ThemeToggle() {
         }}
       />
       
-      {/* Icono Luna */}
       <Moon
-        size={20}
+        size={16}
         style={{
           position: 'absolute',
           color: 'var(--accent-primary)',

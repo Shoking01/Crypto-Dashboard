@@ -161,13 +161,6 @@ function App() {
       <main
         id="main-content"
         className="main-content"
-        style={{
-          flex: 1,
-          maxWidth: '1600px',
-          width: '100%',
-          margin: '0 auto',
-          padding: 'var(--space-8)',
-        }}
       >
         {/* Layout Grid - Responsivo */}
         <div className="app-layout-grid">
