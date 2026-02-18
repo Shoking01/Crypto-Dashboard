@@ -11,6 +11,7 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { Search, X } from 'lucide-react';
 import { searchCryptocurrencies } from '../../services';
+import { sanitizeSearchQuery } from '../../utils/security';
 import type { SearchResult } from '../../types';
 
 interface SearchBarProps {
@@ -30,15 +31,17 @@ const SearchBarComponent = memo(function SearchBar({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const sanitizedQuery = sanitizeSearchQuery(query);
+    
     const timer = setTimeout(async () => {
-      if (query.trim()) {
+      if (sanitizedQuery) {
         setIsLoading(true);
         try {
-          const response = await searchCryptocurrencies(query);
+          const response = await searchCryptocurrencies(sanitizedQuery);
           setResults(response.coins.slice(0, 5));
           setIsOpen(true);
-        } catch (error) {
-          console.error('Search error:', error);
+        } catch {
+          setResults([]);
         } finally {
           setIsLoading(false);
         }
