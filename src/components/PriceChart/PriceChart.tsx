@@ -5,7 +5,7 @@
  * - rerender-memo: Componente memoizado
  * - Manejo de errores con retry
  * - Downsampling de datos
- * - Carga progresiva
+ * - Sin animaciones para mejor rendimiento
  * - Diseño responsivo con CSS classes
  */
 
@@ -13,7 +13,6 @@ import { memo, useMemo, useCallback } from 'react';
 import {
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   Area,
@@ -23,6 +22,7 @@ import { RefreshCw, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import type { ChartDataPoint, TimeFrame } from '../../types';
 import { formatPrice, formatDate } from '../../utils';
 import { useTheme } from '../../context/ThemeContext';
+import { downsampleData } from '../../utils/chartUtils';
 
 interface PriceChartProps {
   data: ChartDataPoint[];
@@ -35,7 +35,7 @@ interface PriceChartProps {
   coinSymbol?: string;
 }
 
-function CustomTooltip({
+const CustomTooltip = memo(function CustomTooltip({
   active,
   payload,
   label,
@@ -51,40 +51,22 @@ function CustomTooltip({
       <div
         style={{
           background: isDark ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.98)',
-          backdropFilter: 'blur(10px)',
           border: `1px solid ${isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.2)'}`,
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-3) var(--space-4)',
-          boxShadow: 'var(--shadow-lg)',
+          borderRadius: 'var(--radius-md)',
+          padding: 'var(--space-2) var(--space-3)',
         }}
       >
-        <p
-          style={{
-            margin: 0,
-            marginBottom: 'var(--space-1)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 'var(--font-xs)',
-            color: 'var(--text-muted)',
-          }}
-        >
+        <p style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
           {formatDate(label || 0)}
         </p>
-        <p
-          style={{
-            margin: 0,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 'var(--font-lg)',
-            fontWeight: 700,
-            color: 'var(--accent-primary)',
-          }}
-        >
+        <p style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 'var(--font-base)', fontWeight: 700, color: 'var(--accent-primary)' }}>
           {formatPrice(payload[0].value)}
         </p>
       </div>
     );
   }
   return null;
-}
+});
 
 const PriceChartComponent = memo(function PriceChart({
   data,
@@ -98,14 +80,20 @@ const PriceChartComponent = memo(function PriceChart({
 }: PriceChartProps) {
   const { isDark } = useTheme();
 
-  const { priceChange, isPositive, lastPrice } = useMemo(() => {
+  const { priceChange, isPositive, lastPrice, optimizedData } = useMemo(() => {
     if (!data || data.length <= 1) {
-      return { priceChange: 0, isPositive: false, lastPrice: 0 };
+      return { priceChange: 0, isPositive: false, lastPrice: 0, optimizedData: [] };
     }
-    const firstPrice = data[0].price;
-    const lastPrice = data[data.length - 1].price;
+    
+    const isMobile = window.innerWidth < 768;
+    const maxPoints = isMobile ? 50 : 100;
+    const downsampled = downsampleData(data, maxPoints);
+    
+    const firstPrice = downsampled[0].price;
+    const lastPrice = downsampled[downsampled.length - 1].price;
     const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-    return { priceChange: change, isPositive: change >= 0, lastPrice };
+    
+    return { priceChange: change, isPositive: change >= 0, lastPrice, optimizedData: downsampled };
   }, [data]);
 
   const formatXAxis = useCallback((timestamp: number) => {
@@ -116,12 +104,7 @@ const PriceChartComponent = memo(function PriceChart({
     return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
   }, [timeframe]);
 
-  const colors = useMemo(() => ({
-    stroke: isPositive ? 'var(--status-success)' : 'var(--status-danger)',
-    fill: isPositive ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
-    gradientStart: isPositive ? '#10b981' : '#ef4444',
-    gradientEnd: isPositive ? '#06b6d4' : '#f97316',
-  }), [isPositive]);
+  const strokeColor = isPositive ? '#10b981' : '#ef4444';
 
   if (isLoading) {
     return (
@@ -154,7 +137,7 @@ const PriceChartComponent = memo(function PriceChart({
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!optimizedData || optimizedData.length === 0) {
     return (
       <div className="glass-card price-chart-empty">
         <p className="price-chart-empty-text">
@@ -190,53 +173,35 @@ const PriceChartComponent = memo(function PriceChart({
       <div className="price-chart-chart">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={data}
-            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+            data={optimizedData}
+            margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
           >
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={colors.gradientStart} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={colors.gradientStart} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="strokeGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={colors.gradientStart} />
-                <stop offset="100%" stopColor={colors.gradientEnd} />
+                <stop offset="5%" stopColor={strokeColor} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="var(--border-subtle)"
-              vertical={false}
-            />
             
             <XAxis
               dataKey="timestamp"
               tickFormatter={formatXAxis}
               stroke="var(--border-default)"
-              tick={{
-                fill: 'var(--text-muted)',
-                fontSize: 11,
-                fontFamily: 'var(--font-mono)',
-              }}
-              axisLine={{ stroke: 'var(--border-default)' }}
-              tickLine={{ stroke: 'var(--border-default)' }}
+              tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
+              axisLine={{ stroke: 'var(--border-subtle)' }}
+              tickLine={false}
               interval="preserveStartEnd"
-              minTickGap={50}
+              minTickGap={60}
             />
             
             <YAxis
               domain={['auto', 'auto']}
               tickFormatter={(value) => formatPrice(value)}
               stroke="var(--border-default)"
-              tick={{
-                fill: 'var(--text-muted)',
-                fontSize: 11,
-                fontFamily: 'var(--font-mono)',
-              }}
-              axisLine={{ stroke: 'var(--border-default)' }}
-              tickLine={{ stroke: 'var(--border-default)' }}
-              width={80}
+              tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
+              axisLine={false}
+              tickLine={false}
+              width={65}
             />
             
             <Tooltip content={<CustomTooltip isDark={isDark} />} />
@@ -244,19 +209,18 @@ const PriceChartComponent = memo(function PriceChart({
             <Area
               type="monotone"
               dataKey="price"
-              stroke="url(#strokeGradient)"
-              strokeWidth={2}
+              stroke={strokeColor}
+              strokeWidth={1.5}
               fillOpacity={1}
               fill="url(#colorPrice)"
-              animationDuration={800}
-              isAnimationActive={true}
+              isAnimationActive={false}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
       <div className="price-chart-footer">
-        <span>{data.length} puntos</span>
+        <span>{optimizedData.length} puntos</span>
         <span>{timeframeLabel}</span>
       </div>
     </div>
